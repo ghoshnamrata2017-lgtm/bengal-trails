@@ -203,11 +203,28 @@
   }</script><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIINfQ3hK2wq4c3e7Q8vY1xX2p1cQ5j1QmQ=" crossorigin=""/>
 <style>
 #placeMiniMap{height:260px;min-height:260px;border-radius:14px;overflow:hidden;z-index:1}
+#districtLeafletMap{height:100%;min-height:255px;width:100%;z-index:1}
 .place-explore-card{transition:transform .2s ease,box-shadow .2s ease}
 .place-explore-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
 .place-explore-card img{height:150px;object-fit:cover}
 </style>
-</head><body class="bg-background font-body-md text-on-surface min-h-screen flex flex-col"><header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md shadow-[0_4px_20px_rgba(184,80,40,0.05)]"><div class="h-20 max-w-7xl mx-auto px-gutter flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-md shrink-0"><img alt="Bengal Tourism Emblem" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAdmfDIqpmVRHmSU3ppdJhABasbs8eQ_g-7zkXoJWJEUv-xyYxt5VaWWHpohdxehEO4k-LJZ8craH2005WkAlmBYCKfzw2n_udZ-zvLSO0U7brfxkDO3Af7vh0_VOo7jNh5A8mNHrJFp50JMAfkVaTG82d2tB7V_ikU5bQDaaBZR55B5lU2thjjA2m5BTre7B5Ko8ofLHDjbe5kPe_4ZiaY7TyJullkMTJwdn5haX7QEc1xm6psrvSS"><div class="flex flex-col justify-center"><span class="font-headline-sm text-headline-sm text-primary leading-tight font-serif tracking-tight">Bengal Trails</span><span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">West Bengal Tourism Guide</span></div></div><div class="hidden xl:flex items-center flex-1 max-w-md mx-space-md"><div class="w-full flex items-center bg-surface-container-low px-space-sm py-1.5 rounded-full ring-1 ring-outline-variant/30 focus-within:ring-primary focus-within:bg-surface transition-all"><span class="material-symbols-outlined text-outline text-[20px] ml-1 mr-2">search</span><input class="w-full bg-transparent text-on-surface placeholder:text-outline font-body-sm text-body-sm focus:outline-none" placeholder="Search Darjeeling, Bishnupur, Sundarbans..." type="text"></div></div><nav class="hidden lg:flex items-center gap-space-md shrink-0" data-active-classes="text-primary font-semibold"><a aria-current="page" class="transition-colors text-primary font-semibold" data-path="all-23-districts" href="#">All 23 Districts</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" data-path="explore-regions" href="#">Explore Regions</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" data-path="popular-itineraries" href="#">Popular Itineraries</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" data-path="heritage-and-festivals" href="#">Heritage &amp; Festivals</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" data-path="trip-planner" href="#">Trip Planner</a></nav><div class="flex items-center gap-space-sm shrink-0"><div class="hidden sm:flex items-center bg-error-container/60 text-on-error-container px-2.5 py-1 rounded-full text-label-sm font-label-sm font-medium"><span class="material-symbols-outlined text-[15px] mr-1">support_agent</span>Helpline 1363</div><button class="flex items-center justify-center p-2 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" title="Language Selector" type="button"><span class="font-label-sm text-label-sm font-semibold">EN / বাংলা</span></button><button class="flex items-center justify-center p-2 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-colors" title="Saved Bookmarks" type="button"><span class="material-symbols-outlined text-[20px]">bookmark</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-sm"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full pt-20 bg-background flex-1"><div class="flex flex-col w-full">
+<style>
+/* Bengali language tab */
+#languageToggle.lang-active{background:#983912;color:#fff;box-shadow:0 4px 12px rgba(152,57,18,.22)}
+.bengali-mode .english-only{display:none!important}
+.bengali-mode .bengali-only{display:inline!important}
+.bengali-only{display:none}
+</style>
+<style>
+/* Full tourism place details modal */
+#placeDetailsOverlay{display:none;}
+#placeDetailsOverlay.show{display:flex;}
+#placeDetailsModal{transform:translateY(24px) scale(.98);opacity:0;transition:transform .25s ease,opacity .25s ease;}
+#placeDetailsOverlay.show #placeDetailsModal{transform:translateY(0) scale(1);opacity:1;}
+.place-detail-scroll::-webkit-scrollbar{display:none;}
+.place-detail-scroll{scrollbar-width:none;}
+</style>
+</head><body class="bg-background font-body-md text-on-surface min-h-screen flex flex-col"><header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md shadow-[0_4px_20px_rgba(184,80,40,0.05)]"><div class="h-20 max-w-7xl mx-auto px-gutter flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-md shrink-0"><img alt="Bengal Tourism Emblem" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAdmfDIqpmVRHmSU3ppdJhABasbs8eQ_g-7zkXoJWJEUv-xyYxt5VaWWHpohdxehEO4k-LJZ8craH2005WkAlmBYCKfzw2n_udZ-zvLSO0U7brfxkDO3Af7vh0_VOo7jNh5A8mNHrJFp50JMAfkVaTG82d2tB7V_ikU5bQDaaBZR55B5lU2thjjA2m5BTre7B5Ko8ofLHDjbe5kPe_4ZiaY7TyJullkMTJwdn5haX7QEc1xm6psrvSS"><div class="flex flex-col justify-center"><span class="font-headline-sm text-headline-sm text-primary leading-tight font-serif tracking-tight">Bengal Trails</span><span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">West Bengal Tourism Guide</span></div></div><div class="hidden xl:flex items-center flex-1 max-w-md mx-space-md"><div class="w-full flex items-center bg-surface-container-low px-space-sm py-1.5 rounded-full ring-1 ring-outline-variant/30 focus-within:ring-primary focus-within:bg-surface transition-all"><span class="material-symbols-outlined text-outline text-[20px] ml-1 mr-2">search</span><input class="w-full bg-transparent text-on-surface placeholder:text-outline font-body-sm text-body-sm focus:outline-none" placeholder="Search Darjeeling, Bishnupur, Sundarbans..." type="text"></div></div><nav class="hidden lg:flex items-center gap-space-md shrink-0" data-active-classes="text-primary font-semibold"><a aria-current="page" class="transition-colors text-primary font-semibold" data-path="all-23-districts" href="#">All 23 Districts</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" data-path="explore-regions" href="#">Explore Regions</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" data-path="popular-itineraries" href="#">Popular Itineraries</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" data-path="heritage-and-festivals" href="#">Heritage &amp; Festivals</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" data-path="trip-planner" href="#">Trip Planner</a></nav><div class="flex items-center gap-space-sm shrink-0"><div class="hidden sm:flex items-center bg-error-container/60 text-on-error-container px-2.5 py-1 rounded-full text-label-sm font-label-sm font-medium"><span class="material-symbols-outlined text-[15px] mr-1">support_agent</span>Helpline 1363</div><button id="languageToggle" class="flex items-center justify-center px-3 py-2 rounded-full bg-primary text-on-primary shadow-sm transition-colors" title="Language: বাংলা" type="button" onclick="toggleBengali()"><span class="font-label-sm text-label-sm font-semibold">বাংলা</span></button><button class="flex items-center justify-center p-2 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-colors" title="Saved Bookmarks" type="button"><span class="material-symbols-outlined text-[20px]">bookmark</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-sm"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full pt-20 bg-background flex-1"><div class="flex flex-col w-full">
 <!-- Subtle Background Motif & Ambient Glows -->
 <div class="relative w-full overflow-hidden">
 <div class="absolute -top-40 -right-40 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -1420,18 +1437,7 @@
 <div class="p-space-lg flex flex-col gap-space-md" id="drawerContent">
 <!-- Media Header -->
 <div class="relative h-64 w-full rounded-xl overflow-hidden bg-surface-container shadow-inner">
-<div class="w-full h-full relative bg-surface-container-high overflow-hidden flex items-center justify-center" id="drawerMapLocation"><svg viewBox="0 0 400 480" class="w-full h-full max-h-64 select-none" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="400" height="480" fill="#f5f3f0"></rect><path d="M175 22 C185 18, 198 25, 202 38 C206 50, 195 62, 210 75 C222 85, 240 82, 245 96 C248 108, 235 120, 238 135 C230 148, 215 152, 212 170 C208 190, 225 210, 218 230 C210 248, 185 255, 175 272 C168 285, 178 305, 170 325 C162 342, 142 355, 145 375 C148 392, 168 402, 165 420 C160 440, 135 448, 120 445 C98 440, 88 418, 92 395 C95 375, 115 362, 120 342 C125 320, 110 305, 115 285 C120 268, 142 260, 148 242 C152 225, 140 208, 148 190 C155 172, 172 165, 175 145 C178 128, 168 112, 172 95 C175 75, 165 50, 170 35 Z" fill="#e4e2df" stroke="#8a726a" stroke-width="1.5" stroke-dasharray="2 2"></path><path d="M182 25 L210 32 L225 55 L208 72 L185 62 Z" fill="#c1ecd4" stroke="#3f6653" stroke-width="1" opacity="0.75"></path><path d="M208 72 L242 85 L235 125 L198 115 L195 85 Z" fill="#c1ecd4" stroke="#3f6653" stroke-width="1" opacity="0.6"></path><path d="M190 120 L225 130 L212 185 L175 170 Z" fill="#ffddb4" stroke="#794e00" stroke-width="1" opacity="0.7"></path><path d="M175 170 L215 185 L218 240 L168 235 Z" fill="#ffddb4" stroke="#794e00" stroke-width="1" opacity="0.6"></path><path d="M145 220 L195 230 L188 285 L135 275 Z" fill="#ffdbcf" stroke="#983912" stroke-width="1" opacity="0.7"></path><path d="M120 275 L175 282 L165 340 L108 330 Z" fill="#ffdbcf" stroke="#983912" stroke-width="1" opacity="0.6"></path><path d="M165 285 L215 290 L220 355 L165 350 Z" fill="#beead1" stroke="#3f6653" stroke-width="1" opacity="0.75"></path><path d="M110 335 L165 345 L158 415 L100 405 Z" fill="#eae8e5" stroke="#8a726a" stroke-width="1" opacity="0.8"></path><path d="M165 350 L210 355 L218 430 L158 420 Z" fill="#beead1" stroke="#3f6653" stroke-width="1" opacity="0.85"></path><g class="cursor-pointer" onclick="openDistrictDrawer('darjeeling')"><circle cx="192" cy="42" r="6" fill="#983912" stroke="#ffffff" stroke-width="2"></circle><text x="203" y="46" font-family="Plus Jakarta Sans" font-size="10" font-weight="600" fill="#1b1c1a">Darjeeling</text></g><g class="cursor-pointer" onclick="openDistrictDrawer('kalimpong')"><circle cx="218" cy="52" r="5" fill="#3f6653" stroke="#ffffff" stroke-width="2"></circle><text x="227" y="55" font-family="Plus Jakarta Sans" font-size="9" font-weight="600" fill="#1b1c1a">Kalimpong</text></g><g class="cursor-pointer" onclick="openDistrictDrawer('malda')"><circle cx="195" cy="155" r="5" fill="#794e00" stroke="#ffffff" stroke-width="1.5"></circle><text x="205" y="158" font-family="Plus Jakarta Sans" font-size="9" font-weight="600" fill="#1b1c1a">Malda</text></g><g class="cursor-pointer" onclick="openDistrictDrawer('murshidabad')"><circle cx="198" cy="210" r="5" fill="#983912" stroke="#ffffff" stroke-width="1.5"></circle><text x="208" y="213" font-family="Plus Jakarta Sans" font-size="9" font-weight="600" fill="#1b1c1a">Murshidabad</text></g><g class="cursor-pointer" onclick="openDistrictDrawer('birbhum')"><circle cx="152" cy="248" r="5" fill="#983912" stroke="#ffffff" stroke-width="1.5"></circle><text x="100" y="251" font-family="Plus Jakarta Sans" font-size="9" font-weight="600" fill="#1b1c1a">Birbhum</text></g><g class="cursor-pointer" onclick="openDistrictDrawer('purulia')"><circle cx="132" cy="305" r="5" fill="#794e00" stroke="#ffffff" stroke-width="1.5"></circle><text x="86" y="308" font-family="Plus Jakarta Sans" font-size="9" font-weight="600" fill="#1b1c1a">Purulia</text></g><g class="cursor-pointer" onclick="openDistrictDrawer('bankura')"><circle cx="152" cy="320" r="6" fill="#983912" stroke="#ffffff" stroke-width="2"></circle><text x="162" y="323" font-family="Plus Jakarta Sans" font-size="10" font-weight="600" fill="#1b1c1a">Bankura</text></g><g class="cursor-pointer" onclick="openDistrictDrawer('kolkata')"><circle cx="194" cy="345" r="7" fill="#983912" stroke="#ffffff" stroke-width="2"></circle><circle cx="194" cy="345" r="11" fill="#983912" opacity="0.2" class="animate-ping"></circle><text x="206" y="349" font-family="Plus Jakarta Sans" font-size="11" font-weight="700" fill="#983912">Kolkata ★</text></g><g class="cursor-pointer" onclick="openDistrictDrawer('purba-medinipur')"><circle cx="158" cy="398" r="5" fill="#3f6653" stroke="#ffffff" stroke-width="1.5"></circle><text x="168" y="402" font-family="Plus Jakarta Sans" font-size="9" font-weight="600" fill="#1b1c1a">Digha</text></g><g class="cursor-pointer" onclick="openDistrictDrawer('south-24-parganas')"><circle cx="202" cy="395" r="6" fill="#3f6653" stroke="#ffffff" stroke-width="2"></circle><text x="212" y="399" font-family="Plus Jakarta Sans" font-size="9" font-weight="600" fill="#1b1c1a">Sundarbans</text></g></svg><div class="absolute top-2 right-2 bg-surface/90 backdrop-blur-sm px-2 py-1 rounded text-label-sm font-label-sm text-outline border border-outline-variant/20 shadow-xs flex items-center gap-1"><span class="material-symbols-outlined text-[13px] text-primary">touch_app</span> Click pin to switch</div></div>
-<div class="absolute bottom-3 left-3 bg-surface/90 backdrop-blur-md px-3 py-1 rounded-full text-label-sm font-label-sm text-on-surface font-semibold flex items-center gap-1 shadow-sm">
-<span class="material-symbols-outlined text-[15px] text-primary">pin_drop</span> <span id="drawerDistanceDisplay" class="">0 km from Kolkata</span>
-</div>
-</div>
-<div>
-<h2 class="font-headline-lg text-headline-lg text-on-surface leading-tight" id="drawerTitle">District Name</h2>
-<p class="font-title-md text-title-md text-primary font-serif mt-0.5" id="drawerTagline">Cultural &amp; Tourist Identity</p>
-<p class="font-body-md text-body-md text-on-surface-variant mt-space-sm leading-relaxed" id="drawerDescription">
-          Comprehensive geographical, historical, and travel description of the district.
-        </p>
-</div>
+<div class="w-full h-full relative bg-surface-container-high overflow-hidden" id="drawerMapLocation"><div id="districtLeafletMap"></div><div class="absolute top-2 left-2 z-[500] bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg text-xs font-semibold shadow-sm">Tourist Places Map</div></div>
 <!-- Top Places List -->
 <div class="flex flex-col gap-space-xs">
 <h4 class="font-label-md text-label-md uppercase tracking-wider text-on-surface font-bold flex items-center gap-1.5">
@@ -1493,6 +1499,9 @@
     let placeMiniMap = null;
     let placeMiniMarker = null;
     let currentDistrictForMap = '';
+    let placeDetailMap = null;
+    let placeDetailMarker = null;
+    let currentPlaceDetail = null;
 
     const placeCategory = (place) => place.category || 'Sightseeing';
     const placeSeason = (place) => place.season || 'Oct – Mar';
@@ -1508,6 +1517,31 @@
         const info=pages[0] && pages[0].imageinfo && pages[0].imageinfo[0];
         if(info) img.src=info.thumburl || info.url;
       }catch(e){ /* keep fallback */ }
+    }
+
+    function showDistrictPlacesOnMap(data){
+      if(!districtLeafletMap){
+        districtLeafletMap = L.map('districtLeafletMap',{scrollWheelZoom:true,zoomControl:true}).setView([23.5,87.8],7);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap contributors'}).addTo(districtLeafletMap);
+      }
+      districtPlaceMarkers.forEach(m=>m.remove());
+      districtPlaceMarkers=[];
+      const bounds=[];
+      const districtKey = data._key || '';
+      (data.places||[]).forEach((place,index)=>{
+        if(place.lat==null || place.lng==null) return;
+        const lat=Number(place.lat), lon=Number(place.lng);
+        if(!Number.isFinite(lat)||!Number.isFinite(lon)) return;
+        const marker=L.marker([lat,lon]).addTo(districtLeafletMap);
+        marker.bindPopup(`<b>${escapePlaceText(place.name)}</b><br>${escapePlaceText(data.name)}<br><span>${escapePlaceText(place.category||'Sightseeing')}</span><br><button type="button" onclick="openPlaceDetails(districtDatabase['${String(data._key||'').replace(/'/g,"\\'")}'].places[${index}], '${String(data.name).replace(/'/g,"\\'")}')" style="margin-top:6px;padding:4px 8px;border:0;border-radius:6px;background:#983912;color:#fff;cursor:pointer">View Details</button>`);
+        marker.on('click',()=>{ document.getElementById('placeMapLabel').textContent=place.name; });
+        districtPlaceMarkers.push(marker); bounds.push([lat,lon]);
+      });
+      setTimeout(()=>{
+        districtLeafletMap.invalidateSize();
+        if(bounds.length===1) districtLeafletMap.setView(bounds[0],13);
+        else if(bounds.length>1) districtLeafletMap.fitBounds(bounds,{padding:[25,25]});
+      },100);
     }
 
     async function showPlaceOnMiniMap(place, district){
@@ -1971,6 +2005,7 @@ const districtDatabase = {
     function openDistrictDrawer(districtKey) {
       const data = districtDatabase[districtKey];
       if (!data) return;
+      data._key = districtKey;
 
       document.getElementById('drawerTitle').textContent = data.name;
       document.getElementById('drawerBadge').textContent = data.landscape;
@@ -1984,9 +2019,8 @@ const districtDatabase = {
       document.getElementById('drawerFestivals').textContent = data.festivals;
       document.getElementById('drawerLodge').textContent = data.lodge;
 
-      // Update Map preview location
-      const mapContainer = document.getElementById('drawerMapLocation');
-      mapContainer.setAttribute('data-location', `${data.name}, West Bengal, India`);
+      // Update Leaflet map with every tourist place marker
+      currentDistrictForMap = data.name;
 
       // Populate detailed tourist places
       const placesContainer = document.getElementById('drawerPlacesList');
@@ -2011,14 +2045,13 @@ const districtDatabase = {
         const img=item.querySelector('img');
         img.dataset.query=place.imageQuery;
         loadPlaceImage(img, place.imageQuery);
-        item.querySelector('button').addEventListener('click',()=>{
-          showPlaceOnMiniMap(place,data.name);
-          document.getElementById('placeMapLabel').textContent = `${place.name} • ${place.category}`;
+        item.querySelector('button').addEventListener('click',(ev)=>{
+          ev.stopPropagation();
+          openPlaceDetails(place, data.name);
         });
         placesContainer.appendChild(item);
       });
-      currentDistrictForMap = data.name;
-      setTimeout(()=>{ if(placeMiniMap) placeMiniMap.invalidateSize(); if(data.places[0]) showPlaceOnMiniMap(data.places[0], data.name); }, 150);
+      setTimeout(()=>{ showDistrictPlacesOnMap(data); }, 150);
 
       const overlay = document.getElementById('districtDrawerOverlay');
       const drawer = document.getElementById('districtDrawer');
@@ -2028,6 +2061,67 @@ const districtDatabase = {
         drawer.classList.remove('translate-x-full');
       }, 10);
       document.body.style.overflow = 'hidden';
+    }
+
+    function escapePlaceText(value){
+      return String(value ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    }
+
+    function openPlaceDetails(place, district){
+      if(!place) return;
+      currentPlaceDetail = {place, district};
+      const category = placeCategory(place);
+      const season = placeSeason(place);
+      const description = placeDescription(place, district);
+      const fallback = `https://placehold.co/1200x700/e8f0ea/1f5134?text=${encodeURIComponent(place.name)}`;
+      const image = document.getElementById('placeDetailImage');
+      image.src = fallback;
+      image.alt = `${place.name}, ${district}`;
+      document.getElementById('placeDetailCategory').textContent = category;
+      document.getElementById('placeDetailTitle').textContent = place.name;
+      document.getElementById('placeDetailDistrict').textContent = `${district}, West Bengal`;
+      document.getElementById('placeDetailDescription').textContent = description;
+      document.getElementById('placeDetailSeason').textContent = season;
+      document.getElementById('placeDetailCategory2').textContent = category;
+      document.getElementById('placeDetailLat').textContent = place.lat != null ? Number(place.lat).toFixed(4) + '° N' : 'Not available';
+      document.getElementById('placeDetailLng').textContent = place.lng != null ? Number(place.lng).toFixed(4) + '° E' : 'Not available';
+      document.getElementById('placePlanSeason').textContent = season;
+      document.getElementById('placePlanCategory').textContent = category;
+      document.getElementById('placePlanCoords').textContent = (place.lat != null && place.lng != null) ? `${Number(place.lat).toFixed(4)}, ${Number(place.lng).toFixed(4)}` : 'Not available';
+      loadPlaceImage(image, place.imageQuery);
+
+      const overlay = document.getElementById('placeDetailsOverlay');
+      overlay.classList.add('show');
+      document.body.style.overflow = 'hidden';
+
+      const updateMap = () => {
+        if(!placeDetailMap){
+          placeDetailMap = L.map('placeDetailMap',{scrollWheelZoom:false,zoomControl:true}).setView([23.5,87.8],7);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap contributors'}).addTo(placeDetailMap);
+        }
+        if(place.lat != null && place.lng != null){
+          const lat=Number(place.lat), lng=Number(place.lng);
+          placeDetailMap.setView([lat,lng],14,{animate:false});
+          if(placeDetailMarker) placeDetailMarker.remove();
+          placeDetailMarker=L.marker([lat,lng]).addTo(placeDetailMap).bindPopup(`<b>${escapePlaceText(place.name)}</b><br>${escapePlaceText(district)}`).openPopup();
+        }
+        setTimeout(()=>placeDetailMap.invalidateSize(),100);
+      };
+      setTimeout(updateMap,120);
+
+      document.getElementById('placeShowMapBtn').onclick = () => {
+        closePlaceDetails();
+        setTimeout(()=>{
+          showPlaceOnMiniMap(place,district);
+          document.getElementById('placeMapLabel').textContent = `${place.name} • ${category}`;
+        },320);
+      };
+    }
+
+    function closePlaceDetails(event){
+      if(event && event.target !== document.getElementById('placeDetailsOverlay')) return;
+      document.getElementById('placeDetailsOverlay').classList.remove('show');
+      document.body.style.overflow = '';
     }
 
     function closeDistrictDrawer() {
@@ -2043,4 +2137,83 @@ const districtDatabase = {
   </script>
 </div></main><footer class="w-full bg-surface-container-low text-on-surface border-t border-outline-variant/20 pt-space-xl pb-space-lg"><div class="max-w-7xl mx-auto px-gutter"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-space-lg pb-space-xl border-b border-outline-variant/25"><div class="lg:col-span-2 flex flex-col gap-space-sm"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-primary text-[26px]">verified</span><span class="font-title-md text-title-md text-on-surface">West Bengal Tourism Board Accredited</span></div><p class="font-body-sm text-body-sm text-on-surface-variant max-w-sm">Discover the vibrant soul of Bengal—from misty Kanchenjunga ridges to mangrove labyrinths and terracotta sanctuaries. Crafted for conscious, immersive travelers.</p><div class="flex flex-col gap-1 mt-space-xs"><span class="font-label-sm text-label-sm text-secondary font-semibold uppercase tracking-wider">Emergency &amp; Assistance</span><div class="flex flex-wrap gap-x-space-md gap-y-1 text-body-sm font-body-sm text-on-surface-variant"><span class="">Tourist Helpline: <strong class="text-on-surface">1363</strong></span><span class="">Disaster Mgmt: <strong class="text-on-surface">1070</strong></span><span class="">Ambulance: <strong class="text-on-surface">102</strong></span></div></div></div><div class="flex flex-col gap-space-xs"><span class="font-title-md text-title-md text-on-surface font-serif">Regional Divisions</span><div class="flex flex-col gap-1.5"><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="division-jalpaiguri" href="#">Jalpaiguri (Hills &amp; Dooars)</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="division-malda" href="#">Malda (Gour &amp; Silk Trail)</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="division-burdwan" href="#">Burdwan (Rarh &amp; Terracotta)</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="division-presidency" href="#">Presidency (Delta &amp; Heritage)</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="division-medinipur" href="#">Medinipur (Coast &amp; Forests)</a></div></div><div class="flex flex-col gap-space-xs"><span class="font-title-md text-title-md text-on-surface font-serif">Eco-Tourism &amp; Safety</span><div class="flex flex-col gap-1.5"><span class="font-body-sm text-body-sm text-on-surface-variant">Sundarbans Tide Warnings</span><span class="font-body-sm text-body-sm text-on-surface-variant">Darjeeling Mountain Passes</span><span class="font-body-sm text-body-sm text-on-surface-variant">Dooars Forest Safari Guidelines</span><span class="font-body-sm text-body-sm text-on-surface-variant">Leave No Trace Principles</span><span class="font-body-sm text-body-sm text-on-surface-variant">Licensed Homestay Registry</span></div></div><div class="flex flex-col gap-space-xs"><span class="font-title-md text-title-md text-on-surface font-serif">Festival Gazette</span><p class="font-body-sm text-body-sm text-on-surface-variant">Receive calendar dispatches for Durga Puja, Poush Mela, Rash Mela &amp; Baul utsabs.</p><div class="flex flex-col gap-2 mt-1"><input class="w-full bg-surface px-3 py-2 rounded-lg text-on-surface placeholder:text-outline text-body-sm font-body-sm ring-1 ring-outline-variant/40 focus:ring-primary focus:outline-none" placeholder="Your email address" type="email"><button class="w-full bg-primary text-on-primary font-label-md text-label-md py-2 rounded-lg hover:bg-primary-container transition-colors shadow-sm" type="button">Subscribe to Gazette</button></div></div></div><div class="pt-space-md flex flex-col md:flex-row items-center justify-between gap-space-sm text-on-surface-variant font-body-sm text-body-sm"><p class="">© 2025 Department of Tourism, Government of West Bengal. All rights reserved.</p><div class="flex items-center gap-space-md"><span class="hover:text-primary cursor-pointer transition-colors">Responsible Travel Charter</span><span class="hover:text-primary cursor-pointer transition-colors">Privacy Policy</span><span class="hover:text-primary cursor-pointer transition-colors">Tours &amp; Booking Terms</span></div></div></div></footer>
 
+<script>
+function toggleBengali(){
+  const btn=document.getElementById('languageToggle');
+  const active=document.body.classList.toggle('bengali-mode');
+  btn.classList.toggle('lang-active',active);
+  btn.title=active ? 'Language: বাংলা' : 'Language: English';
+  btn.querySelector('span').textContent=active ? 'বাংলা' : 'EN';
+  try{localStorage.setItem('bengalTrailsLanguage',active?'bn':'en')}catch(e){}
+}
+document.addEventListener('DOMContentLoaded',function(){
+  try{
+    if(localStorage.getItem('bengalTrailsLanguage')==='bn'){
+      document.body.classList.add('bengali-mode');
+      const btn=document.getElementById('languageToggle');
+      if(btn){
+        btn.classList.add('lang-active');
+        btn.title='Language: বাংলা';
+        btn.querySelector('span').textContent='বাংলা';
+      }
+    }
+  }catch(e){}
+});
+</script>
+<!-- Reusable Place Details Modal: opens for every tourism place -->
+<div id="placeDetailsOverlay" class="fixed inset-0 z-[70] items-center justify-center bg-on-background/60 backdrop-blur-sm p-3 md:p-6" onclick="closePlaceDetails(event)">
+  <div id="placeDetailsModal" class="relative w-full max-w-5xl max-h-[94vh] overflow-hidden rounded-2xl bg-surface-container-lowest shadow-2xl" onclick="event.stopPropagation()">
+    <button type="button" onclick="closePlaceDetails()" class="absolute right-4 top-4 z-20 w-10 h-10 rounded-full bg-surface/90 text-on-surface shadow-md flex items-center justify-center hover:bg-surface-container-high" title="Close details">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+    <div class="place-detail-scroll max-h-[94vh] overflow-y-auto">
+      <div class="relative h-64 md:h-80 bg-surface-container-high">
+        <img id="placeDetailImage" class="w-full h-full object-cover" src="https://placehold.co/1200x700/e8f0ea/1f5134?text=Tourism" alt="Tourism place">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent"></div>
+        <div class="absolute left-5 right-16 bottom-5 text-white">
+          <span id="placeDetailCategory" class="inline-flex px-3 py-1 rounded-full bg-white/90 text-primary text-xs font-bold uppercase tracking-wider"></span>
+          <h2 id="placeDetailTitle" class="font-headline-lg text-3xl md:text-4xl font-semibold mt-2 drop-shadow"></h2>
+          <p id="placeDetailDistrict" class="text-white/90 mt-1 font-medium"></p>
+        </div>
+      </div>
+      <div class="p-5 md:p-7 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-8 flex flex-col gap-5">
+          <div>
+            <span class="font-label-sm text-label-sm text-primary uppercase tracking-wider font-bold">About this place</span>
+            <p id="placeDetailDescription" class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed mt-2"></p>
+          </div>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div class="p-3 rounded-xl bg-surface-container-low"><span class="text-xs text-outline block">Best Season</span><strong id="placeDetailSeason" class="block mt-1 text-on-surface"></strong></div>
+            <div class="p-3 rounded-xl bg-surface-container-low"><span class="text-xs text-outline block">Category</span><strong id="placeDetailCategory2" class="block mt-1 text-on-surface"></strong></div>
+            <div class="p-3 rounded-xl bg-surface-container-low"><span class="text-xs text-outline block">Latitude</span><strong id="placeDetailLat" class="block mt-1 text-on-surface"></strong></div>
+            <div class="p-3 rounded-xl bg-surface-container-low"><span class="text-xs text-outline block">Longitude</span><strong id="placeDetailLng" class="block mt-1 text-on-surface"></strong></div>
+          </div>
+          <div class="rounded-xl overflow-hidden border border-outline-variant/20 bg-surface-container-lowest">
+            <div class="px-4 py-3 flex items-center justify-between border-b border-outline-variant/15">
+              <div><span class="font-label-sm text-label-sm text-primary font-bold uppercase tracking-wider">Location Map</span><p class="text-xs text-on-surface-variant mt-0.5">Exact coordinates from the tourism place data.</p></div>
+              <span class="material-symbols-outlined text-primary">location_on</span>
+            </div>
+            <div id="placeDetailMap" class="h-64 bg-surface-container-high"></div>
+          </div>
+        </div>
+        <aside class="lg:col-span-4 flex flex-col gap-4">
+          <div class="p-5 rounded-xl bg-surface-container-low border border-outline-variant/15">
+            <h3 class="font-title-md text-title-md text-on-surface font-semibold">Plan Your Visit</h3>
+            <div class="mt-4 flex flex-col gap-3 text-sm">
+              <div class="flex gap-3"><span class="material-symbols-outlined text-primary">calendar_month</span><div><span class="text-outline block">Recommended season</span><strong id="placePlanSeason"></strong></div></div>
+              <div class="flex gap-3"><span class="material-symbols-outlined text-secondary">category</span><div><span class="text-outline block">Experience</span><strong id="placePlanCategory"></strong></div></div>
+              <div class="flex gap-3"><span class="material-symbols-outlined text-tertiary">pin_drop</span><div><span class="text-outline block">Coordinates</span><strong id="placePlanCoords"></strong></div></div>
+            </div>
+          </div>
+          <button type="button" id="placeShowMapBtn" class="w-full py-3 rounded-xl bg-primary text-on-primary font-label-md font-bold flex items-center justify-center gap-2 hover:bg-primary-container transition-colors">
+            <span class="material-symbols-outlined">map</span> Show on Map
+          </button>
+          <button type="button" onclick="closePlaceDetails()" class="w-full py-3 rounded-xl bg-surface-container-low text-on-surface font-label-md font-semibold flex items-center justify-center gap-2 hover:bg-surface-container-high transition-colors">
+            <span class="material-symbols-outlined">arrow_back</span> Back to Tourism Places
+          </button>
+        </aside>
+      </div>
+    </div>
+  </div>
+</div>
 </body></html>
